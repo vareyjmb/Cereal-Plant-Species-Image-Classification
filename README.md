@@ -234,9 +234,64 @@ test1-test10
 
 <img width="297" height="878" alt="test10" src="https://github.com/user-attachments/assets/ba1f04c1-4490-4b2e-90eb-3147dbd70d83" />
 
+-----------------------
+Reflection Question
+--------------
 
-
-
+1. How did the number of images per class affect your model's accuracy?
+The number of images per class (250+ per class for training) provided a solid foundation, but sample quality and diversity proved more critical than raw quantity. All classes had relatively balanced validation samples (40-47 images), yet accuracy varied dramatically:
+High performers (100% accuracy): Wheat, oats, quinoa, amaranth, einkorn, emmer, millet proso
+Low performers (30-70% accuracy): Rice (30%), triticale (70%), spelt (70%)
+Rice had 40 validation samples (similar to high-performing classes) but only 30% accuracy, indicating that rice images likely lacked sufficient visual diversity or had quality issues (lighting, angles, background clutter) compared to other classes.
+2. Which plant species were most commonly misclassified and why?
+Rice was the most problematic class with only 30% accuracy. According to the confusion matrix:
+15 rice samples misclassified as wheat
+9 rice samples misclassified as barley
+Some confusion with rye and sorghum
+Secondary issues:
+Triticale: 10 samples misclassified as wheat
+Spelt: 11 samples misclassified as wheat
+Reasons:
+Visual similarity: Rice in certain growth stages resembles wheat/barley (tall grasses with seed heads)
+Feature overlap: All are cereal crops with similar morphological structures (long leaves, grain-bearing stalks)
+Wheat variety confusion: Triticale and spelt are wheat hybrids/relatives, making them genetically and visually similar to wheat
+3. How did changing the epochs, batch size, or learning rate affect the training results?
+Your settings (50 epochs, batch size 16, learning rate 0.001) showed:
+Positive outcomes:
+Fast convergence: Training accuracy reached ~98% by epoch 10
+Stable training: Loss dropped rapidly and stabilized after epoch 10
+Issues observed:
+Overfitting indicators: The test loss spiked dramatically at epoch 50, while training loss remained low—classic overfitting
+Instability: Minor accuracy/loss spike around epoch 20 suggests the learning rate (0.001) may have been slightly high for fine-tuning
+Diminishing returns: After epoch 20, validation accuracy plateaued, meaning epochs 20-50 provided minimal benefit
+Recommendation: Reducing to 30-35 epochs would likely maintain accuracy while preventing the end-of-training overfitting visible in your loss graph.
+4. What challenges did you encounter during dataset collection and labeling?
+Based on your confusion matrix and test results:
+High inter-class similarity: Distinguishing between wheat and wheat relatives (spelt, triticale, durum wheat, einkorn, emmer) was challenging due to shared morphological features
+Rice collection difficulties: The low rice accuracy suggests either:
+Limited angle variety (only side views vs. top-down)
+Inconsistent growth stages (paddy flooding vs. mature harvest)
+Background confusion (rice paddies look different from dryland cereal fields)
+Class imbalance in visual features: Some classes (quinoa, amaranth) have distinctive colorful seed heads that make classification easy, while grassy cereals look similar
+Growth stage variation: Images likely varied between young vegetative stages vs. mature grain heads, creating intra-class diversity that complicated learning
+5. If you were to improve your model, what specific changes would you make and why?
+Immediate improvements:
+Increase rice image diversity (Priority #1):
+Add more overhead/panoramic paddy views (distinctive flooded fields)
+Include transplanting stage images (unique to rice cultivation)
+Add Asian rice vs. African rice varieties to capture morphological diversity
+Why: Rice's 30% accuracy is a major outlier dragging down overall model performance
+Reduce epochs to 35:
+Why: Your loss-per-epoch graph shows test loss exploding at epoch 50 while training loss stays flat—clear overfitting. Stopping at epoch 35 would capture the optimal model state.
+Separate wheat varieties better:
+Add close-up shots of grain heads, stem nodes, and leaf sheaths for wheat, spelt, and triticale
+Why: These three show the most confusion in your matrix (21 total misclassifications between them)
+Implement data augmentation:
+Rotate images, adjust brightness/contrast
+Why: Would increase effective dataset size and reduce overfitting without collecting new images
+Add "difficult negative" mining:
+Specifically collect images of rice that look like wheat and vice versa, label them carefully
+Why: Forces the model to learn finer discriminative features rather than general "grass-like" patterns
 
 
 
